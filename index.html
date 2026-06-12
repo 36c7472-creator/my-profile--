@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김정빈 | Portfolio</title>
+    <style>
+        /* ==========================================
+           1. DESIGN SYSTEM & RESET (디자인 시스템 & 초기화)
+           ========================================== */
+        :root {
+            /* 밤하늘을 살짝 더 명도 높고 선명하게 변경 */
+            --bg-deep: #0a0c1f;       /* 좀 더 밝아진 깊은 밤하늘 */
+            --bg-city: #121532;       /* 빌딩 톤 (카드 배경) */
+            --purple-glow: #4c2d8f;   /* 보라색 광원 밝기 업그레이드 */
+            --purple-dark: #1e0d36;   /* 짙은 보라색 그라데이션 */
+            --lamp-gold: #ffdd44;     /* 가로등 불빛 */
+            --lamp-glow: rgba(255, 221, 68, 0.25);
+            --window-light-1: #ffeedd; /* 따뜻한 창문 불빛 1 */
+            --window-light-2: #ffeeaa; /* 밝은 창문 불빛 2 */
+            --text-main: #ffffff;     
+            --text-sub: #cbd5e1;      
+            --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-weight: 600; 
+        }
+
+        /* 고정 배경 그라데이션 */
+        .sky-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 75% 25%, var(--purple-glow) 0%, transparent 60%),
+                        radial-gradient(circle at 20% 75%, var(--purple-dark) 0%, transparent 65%);
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           ADVANCED CITY SCENERY (창문 불빛, 북적이는 실루엣 고도화)
+           ========================================== */
+        .scenery-background {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 55vh; /* 도시 뷰를 조금 더 위로 올림 */
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* 먼 빌딩숲 실루엣 (조금 더 밝게 조정) */
+        .bg-buildings {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(to top, #0f1126 80%, transparent 100%) 5% 100% / 70px 75% no-repeat,
+                linear-gradient(to top, #121530 85%, transparent 100%) 20% 100% / 110px 90% no-repeat,
+                linear-gradient(to top, #0e1022 90%, transparent 100%) 45% 100% / 95px 65% no-repeat,
+                linear-gradient(to top, #14193a 80%, transparent 100%) 70% 100% / 130px 85% no-repeat,
+                linear-gradient(to top, #0b0d1c 95%, transparent 100%) 90% 100% / 85px 95% no-repeat;
+            opacity: 0.5;
+        }
+
+        /* 가까운 마천루 빌딩 + CSS 격자무늬(repeating-linear-gradient)를 활용한 창문 불빛 효과 */
+        .fg-buildings {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            height: 80%;
+            background: 
+                /* 빌딩 1 */
+                linear-gradient(rgba(255,238,221,0.15) 2px, transparent 2px) 12% 45% / 60px 40px no-repeat,
+                linear-gradient(to top, #181b3d 90%, transparent 100%) 12% 100% / 90px 70% no-repeat,
+                
+                /* 빌딩 2 (불 켜진 창문 패턴 추가) */
+                repeating-linear-gradient(to bottom, transparent, transparent 4px, var(--window-light-1) 4px, var(--window-light-1) 8px) 36.5% 35% / 20px 60px no-repeat,
+                repeating-linear-gradient(to bottom, transparent, transparent 4px, var(--window-light-2) 4px, var(--window-light-2) 8px) 39.5% 45% / 15px 40px no-repeat,
+                linear-gradient(to top, #141736 90%, transparent 100%) 35% 100% / 140px 80% no-repeat,
+                
+                /* 빌딩 3 */
+                repeating-linear-gradient(to bottom, transparent, transparent 6px, var(--window-light-2) 6px, var(--window-light-2) 12px) 61.5% 25% / 30px 80px no-repeat,
+                linear-gradient(to top, #1d224e 90%, transparent 100%) 60% 100% / 100px 90% no-repeat,
+                
+                /* 빌딩 4 */
+                linear-gradient(rgba(255,221,68,0.2) 3px, transparent 3px) 83.5% 55% / 50px 30px no-repeat,
+                linear-gradient(to top, #111329 90%, transparent 100%) 82% 100% / 110px 60% no-repeat;
+            opacity: 0.85;
+        }
+
+        /* 가로등 시스템 */
+        .lamp-post {
+            position: absolute;
+            bottom: 40px;
+            width: 4px;
+            height: 180px;
+            background: linear-gradient(to top, #333, #666);
+        }
+        .lamp-post.left { left: 15%; }
+        .lamp-post.right { right: 15%; }
+        
+        .lamp-post::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -8px;
+            width: 20px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 0 20px #ffd700;
+        }
+        
+        .lamp-light-cone {
+            position: absolute;
+            top: 0;
+            left: -48px;
+            width: 100px;
+            height: 180px;
+            background: conic-gradient(from 150deg at 50% 0, var(--lamp-glow) 0deg, transparent 65deg);
+            animation: lightFlicker 5s infinite alternate;
+        }
+
+        @keyframes lightFlicker {
+            0%, 100% { opacity: 1; }
+            80% { opacity: 1; }
+            82% { opacity: 0.85; }
+            84% { opacity: 1; }
+            93% { opacity: 0.90; }
+            95% { opacity: 1; }
+        }
+
+        /* 거리 바닥 공원화 */
+        .street-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to top, #060812 60%, #111424 100%);
+            border-top: 1px solid rgba(255, 221, 68, 0.3);
+        }
+
+        /* 북적거리는 사람들을 위해 컨테이너 마우스 포인터 활성화 */
+        .people-silhouettes {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            height: 40px;
+            pointer-events: auto; /* 마우스 클릭 이벤트를 받기 위해 수정 */
+        }
+        
+        /* CSS만으로 구현한 드나드는 사람 실루엣 (클릭 가능하도록 수정) */
+        .person {
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            height: 28px;
+            background: #090b1a;
+            border-radius: 5px 5px 0 0;
+            opacity: 0.75;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .person:hover {
+            transform: scale(1.15) !important;
+            background: #181c3a;
+        }
+        .person::before { /* 머리 */
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        /* 사람 인원 수 추가 및 속도 다양화로 북적이는 느낌 연출 */
+        .person.p1 { left: 5%; animation: walkAround 22s infinite linear; }
+        .person.p2 { left: 25%; animation: walkAround 15s infinite linear reverse; height: 30px; }
+        .person.p3 { left: 55%; animation: walkAround 28s infinite linear; }
+        .person.p4 { left: 75%; animation: walkAround 18s infinite linear reverse; height: 26px; }
+        .person.p5 { left: 90%; animation: walkAround 35s infinite linear; }
+
+        @keyframes walkAround {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(110vw); }
+        }
+
+        /* 클릭 시 나타날 음표/이펙트 스타일 */
+        .note-effect {
+            position: fixed;
+            font-size: 1.5rem;
+            color: var(--lamp-gold);
+            text-shadow: 0 0 8px rgba(255, 221, 68, 0.8);
+            pointer-events: none;
+            z-index: 9999;
+            animation: floatUpAndFade 1s ease-out forwards;
+        }
+
+        @keyframes floatUpAndFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.3) rotate(20deg);
+            }
+        }
+
+        /* ==========================================
+           2. NAVIGATION BAR (바로가기 UI)
+           ========================================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(10, 12, 31, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4rem;
+        }
+
+        .nav-logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+        .nav-logo span {
+            color: var(--lamp-gold);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-item a {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item a:hover, .nav-item.active a {
+            color: var(--lamp-gold);
+        }
+        
+        .nav-item a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--lamp-gold);
+            transition: var(--transition-smooth);
+        }
+        .nav-item a:hover::after, .nav-item.active a::after {
+            width: 100%;
+        }
+
+        /* ==========================================
+           3. TYPOGRAPHY & LAYOUT
+           ========================================== */
+        section {
+            padding: 8rem 2rem 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 2.6rem;
+            font-weight: 800; 
+            margin-bottom: 4rem;
+            position: relative;
+            display: inline-block;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--lamp-gold);
+            box-shadow: 0 0 12px var(--lamp-gold);
+        }
+
+        /* 카드 UI 고도화 */
+        .card {
+            background: rgba(18, 21, 50, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 3.5rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-smooth);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 221, 68, 0.5);
+            box-shadow: 0 35px 70px rgba(76, 45, 143, 0.3);
+        }
+
+        /* Scroll Reveal 기본 형태 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================
+           4. HERO SECTION
+           ========================================== */
+        #home {
+            height: 100vh;
+            padding-top: 70px;
+        }
+
+        .hero-tag {
+            font-size: 1.2rem;
+            color: var(--lamp-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 900; 
+            line-height: 1.25;
+            margin-bottom: 2.5rem;
+            letter-spacing: -0.04em;
+            color: #ffffff;
+        }
+        
+        .typed-cursor {
+            font-weight: 900;
+            animation: blink 0.7s infinite;
+            color: var(--lamp-gold);
+            margin-left: 6px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .hero-desc {
+            font-size: 1.4rem;
+            color: var(--text-sub);
+            max-width: 650px;
+            font-weight: 700;
+        }
+
+        /* ==========================================
+           5. ABOUT ME SECTION
+           ========================================== */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.9fr;
+            gap: 3rem;
+        }
+
+        .profile-mood-card {
+            background: linear-gradient(135deg, rgba(30, 13, 54, 0.85) 0%, rgba(18, 21, 50, 0.85) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .mood-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.8;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-info-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+        .info-item {
+            border-left: 3px solid var(--lamp-gold);
+            padding-left: 1.5rem;
+        }
+        .info-label {
+            font-size: 0.95rem;
+            color: var(--lamp-gold);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+            font-weight: 800;
+        }
+        .info-value {
+            font-size: 1.2rem;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* ==========================================
+           6. MY SKILLS SECTION
+           ========================================== */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3.5rem;
+        }
+        .skill-box {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .skill-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+        .skill-percentage {
+            color: var(--lamp-gold);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+        .skill-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .skill-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(to right, #6366f1, var(--lamp-gold));
+            width: 0; 
+            border-radius: 5px;
+            transition: width 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .skill-desc {
+            font-size: 1.05rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           7. MY FAVORITES SECTION
+           ========================================== */
+        .fav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .fav-card {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .fav-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        .fav-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        .fav-desc {
+            font-size: 1rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           8. MY DREAM SECTION
+           ========================================== */
+        .dream-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+        }
+        .dream-card {
+            position: relative;
+            border-bottom: 4px solid transparent;
+        }
+        .dream-card:hover {
+            border-bottom-color: var(--lamp-gold);
+        }
+        .dream-badge {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(99, 102, 241, 0.3);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #e0e7ff;
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            font-weight: 800;
+        }
+        .dream-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1.2rem;
+            margin-top: 1rem;
+        }
+        .dream-desc {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            font-weight: 600;
+        }
+        .dream-footer {
+            font-size: 1rem;
+            color: var(--lamp-gold);
+            font-weight: 800;
+        }
+
+        /* ==========================================
+           9. QUOTE SECTION
+           ========================================== */
+        .quote-card {
+            text-align: center;
+            padding: 6rem 3rem;
+        }
+        .quote-text {
+            font-size: 2.3rem;
+            font-weight: 900; 
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, #ffffff, #f3f4f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .quote-author {
+            font-size: 1.1rem;
+            color: var(--lamp-gold);
+            letter-spacing: 0.2em;
+            font-weight: 800;
+        }
+
+        /* ==========================================
+           10. FOOTER
+           ========================================== */
+        footer {
+            padding: 5rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            background: #050711;
+        }
+        footer p {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-sub);
+        }
+        footer .credit {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           11. RESPONSIVE DESIGN (모바일 대응)
+           ========================================== */
+        @media (max-width: 1024px) {
+            .navbar { padding: 0 2rem; }
+            .profile-grid, .dream-wrapper { grid-template-columns: 1fr; }
+            .hero-title { font-size: 3.2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; } 
+            section { padding: 6rem 1.5rem; }
+            .hero-title { font-size: 2.5rem; }
+            .profile-info-details, .skills-container, .fav-grid { grid-template-columns: 1fr; }
+            .quote-text { font-size: 1.7rem; }
+            .lamp-post, .scenery-background { display: none; } /* 모바일에서는 배경 최적화 생략 가능 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sky-gradient"></div>
+    <div class="scenery-background">
+        <div class="bg-buildings"></div>
+        <div class="fg-buildings"></div>
+        <div class="lamp-post left"><div class="lamp-light-cone"></div></div>
+        <div class="lamp-post right"><div class="lamp-light-cone"></div></div>
+        <div class="people-silhouettes">
+            <div class="person p1"></div>
+            <div class="person p2"></div>
+            <div class="person p3"></div>
+            <div class="person p4"></div>
+            <div class="person p5"></div>
+        </div>
+        <div class="street-ground"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-logo">JEONGBIN<span>.P</span></div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="#home">Home</a></li>
+            <li class="nav-item"><a href="#about">About</a></li>
+            <li class="nav-item"><a href="#skills">Skills</a></li>
+            <li class="nav-item"><a href="#favorites">Favorites</a></li>
+            <li class="nav-item"><a href="#dream">Dream</a></li>
+        </ul>
+    </nav>
+
+    <section id="home">
+        <div class="hero-tag">Student Portfolio</div>
+        <h1 class="hero-title"><span id="typewriter"></span><span class="typed-cursor">|</span></h1>
+        <p class="hero-desc">차분하고 잔잔한 밤 도시의 감성 속에서 문학과 음악을 탐구하며 세상을 더 깊고 입체적으로 그리는 창작자, 김정빈입니다.</p>
+    </section>
+
+    <section id="about" class="reveal">
+        <h2 class="section-title">About Me</h2>
+        <div class="profile-grid">
+            <div class="card profile-mood-card">
+                <div class="mood-title">"차분하고 잔잔한<br>밤도시의 분위기를 닮은 사람"</div>
+                <p style="color: var(--text-sub); font-size: 1.05rem; font-weight: 600;">선선한 밤공기를 마시며 깊은 사색에 잠기는 것을 좋아하며, 감성적이고 이성적인 면모를 동시에 가지고 있습니다.</p>
+            </div>
+            <div class="card">
+                <div class="profile-info-details">
+                    <div class="info-item">
+                        <div class="info-label">이름</div>
+                        <div class="info-value">김정빈</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">관심 분야</div>
+                        <div class="info-value">문학, 음악</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">좋아하는 것</div>
+                        <div class="info-value">밤하늘, 밤공기, 피아노 선율, 깊이 있는 책</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">나의 성격</div>
+                        <div class="info-value">차분함, 잔잔함, 사색적</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="reveal">
+        <h2 class="section-title">My Skills</h2>
+        <div class="card skills-container">
+            <div class="skill-box">
+                <div class="skill-header" style="display: flex; justify-content: space-between;">
+                    <span class="skill-name">생각 표현력</span>
+                    <span class="skill-percentage">95%</span>
+                </div>
+                <div class="skill-track">
+                    <div class="skill-bar" data-width="95%"></div>
+                </div>
+                <p class="skill-desc">내면의 복잡하고 추상적인 생각들을 언어와 글, 혹은 예술적 장치를 통해 멋있고 세련되게 시각화합니다.</p>
+            </div>
+            <div class="skill-box">
+                <div class="skill-header" style="display: flex; justify-content: space-between;">
+                    <span class="skill-name">창의력</span>
+                    <span class="skill-percentage">90%</span>
+                </div>
+                <div class="skill-track">
+                    <div class="skill-bar" data-width="90%"></div>
+                </div>
+                <p class="skill-desc">남들이 보지 못하는 일상 속 사소한 각도를 비틀어 독창적인 세계관과 결과물로 재해석하는 능력이 뛰어납니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="favorites" class="reveal">
+        <h2 class="section-title">My Favorites</h2>
+        <div class="fav-grid">
+            <div class="card fav-card">
+                <div class="fav-icon">📺</div>
+                <div class="fav-title">책 소개 유튜브 보기</div>
+                <div class="fav-desc">문학 작품을 다른 시선으로 바라보는 통찰력을 기르고 지적 영감을 얻습니다.</div>
+            </div>
+            <div class="card fav-card">
+                <div class="fav-icon">🎧</div>
+                <div class="fav-title">음악 듣기</div>
+                <div class="fav-desc">선선한 밤의 플레이리스트는 새로운 아이디어를 깨우는 중요한 매개체입니다.</div>
+            </div>
+            <div class="card fav-card">
+                <div class="fav-icon">🎹</div>
+                <div class="fav-title">피아노 치기</div>
+                <div class="fav-desc">건반 위에 생각을 얹어 나만의 무드와 잔잔한 파동을 만들어내는 시간입니다.</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="dream" class="reveal">
+        <h2 class="section-title">My Dream & Goals</h2>
+        <div class="dream-wrapper">
+            <div class="card dream-card">
+                <div class="dream-badge">Literature</div>
+                <div class="dream-title">나만의 책 쓰기</div>
+                <p class="dream-desc">머릿속에 존재하는 정교한 세계관과 깊이 있는 사색을 한 권의 감성적인 문학 책으로 출판하는 것을 목표로 삼고 있습니다.</p>
+                <div class="dream-footer">창작을 향한 도정 <span>→</span></div>
+            </div>
+            <div class="card dream-card">
+                <div class="dream-badge">Music</div>
+                <div class="dream-title">나만의 노래 만들기</div>
+                <p class="dream-desc">단순한 연주를 넘어 밤거리의 무드와 차분한 감성을 조화롭게 엮어낸 고유한 선율의 음악을 세상에 공개하고자 합니다.</p>
+                <div class="dream-footer">작곡 프로젝트 계획 중 <span>→</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="quote" class="reveal">
+        <div class="card quote-card">
+            <p class="quote-text">"창의적으로 세계를 바라보고, 나만의 색으로 밤하늘을 채워나간다."</p>
+            <p class="quote-author">Kim Jeong Bin</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>Made with AI & My Imagination</p>
+        <div class="credit">© 2026 Kim Jeongbin. All rights reserved.</div>
+    </footer>
+
+    <script>
+        /* 1. 타이핑 효과 애니메이션 */
+        const textElement = document.getElementById("typewriter");
+        const words = ["창의적으로 세계를 바라본다.", "김정빈의 포트폴리오입니다."];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 120;
+
+        function type() {
+            const currentWord = words[wordIndex];
+            if (isDeleting) {
+                textElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 60;
+            } else {
+                textElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 120;
+            }
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typingSpeed = 2000; 
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typingSpeed = 500; 
+            }
+
+            setTimeout(type, typingSpeed);
+        }
+
+        /* 2. Scroll Reveal 효과 및 상단 바로가기 UI 활성화 상태 동기화 */
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        function revealAndTrackScroll() {
+            const windowHeight = window.innerHeight;
+            let currentSectionId = 'home';
+
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                
+                if (section.classList.contains('reveal') && sectionTop < windowHeight - 150) {
+                    section.classList.add('active');
+                    const skillBars = section.querySelectorAll('.skill-bar');
+                    skillBars.forEach(bar => {
+                        if (!bar.style.width || bar.style.width === '0px') {
+                            bar.style.width = bar.getAttribute('data-width');
+                        }
+                    });
+                }
+
+                if (window.scrollY >= (section.offsetTop - 120)) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                const href = item.querySelector('a').getAttribute('href').substring(1);
+                if (href === currentSectionId) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        /* 3. 유저 피드백 반영: 지나가는 사람 클릭 시 음표 생성 인터랙션 */
+        const people = document.querySelectorAll('.person');
+        const notes = ['🎵', '🎶', '✨', '🎹', '🎼'];
+
+        people.forEach(person => {
+            person.addEventListener('click', (e) => {
+                // 클릭한 마우스 위치 획득
+                const x = e.clientX;
+                const y = e.clientY;
+
+                // 음표 효과 요소 생성
+                const effect = document.createElement('div');
+                effect.classList.add('note-effect');
+                
+                // 랜덤한 음표 기호 배정
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                effect.textContent = randomNote;
+
+                // 마우스 클릭 위치에 절대 좌표로 배치
+                effect.style.left = `${x - 10}px`;
+                effect.style.top = `${y - 20}px`;
+
+                document.body.appendChild(effect);
+
+                // 애니메이션이 끝나면 요소 제거 (메모리 관리)
+                setTimeout(() => {
+                    effect.remove();
+                }, 1000);
+            });
+        });
+
+        /* 4. 초기화 */
+        window.addEventListener('DOMContentLoaded', () => {
+            if (words.length) setTimeout(type, 500);
+            revealAndTrackScroll();
+        });
+
+        window.addEventListener('scroll', revealAndTrackScroll);
+    </script>
+</body>
+</html>
